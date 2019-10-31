@@ -1,5 +1,6 @@
 from tile import *
 from enemy import *
+from enemy2 import *
 from pygame.sprite import Group
 from warp_zone import WarpZone
 from mystery_box import MysteryBox
@@ -28,7 +29,7 @@ class StageManager:
                     player.die()
 
         for e in self.enemies:
-            e.update(player, self.platforms)
+            e.update(player, self.platforms, self.enemies)
         for p in self.platforms:
             p.update(self.platforms)
 
@@ -39,8 +40,8 @@ class StageManager:
             e.draw(camera)
         for b in self.boxes:
             b.draw(camera)
-        for w in self.warp_zones:
-            w.draw(self.screen, camera)
+        # for w in self.warp_zones:
+        #    w.draw(self.screen, camera)
 
     def load_stage(self, stage, hud):  # character's position in txt file is left bot coordinate
         self.enemies.empty()
@@ -108,24 +109,24 @@ class StageManager:
 
         if stage == 1:
             self.load('stage/stage1.txt', tile_dict)  # build map form txt file
-            self.warp_zones.add(WarpZone('start', id=1, left=46*16, bot=8*16))
-            self.warp_zones.add(WarpZone('end', id=1, left=254*16, bot=3*16))
-            self.warp_zones.add(WarpZone('start', id=2, left=287*16, bot=9*16))
-            self.warp_zones.add(WarpZone('end', id=2, left=179*16, bot=10*16))
+            self.warp_zones.add(WarpZone('start', id_num=1, left=46*16, bot=8*16))
+            self.warp_zones.add(WarpZone('end', id_num=1, left=254*16, bot=3*16))
+            self.warp_zones.add(WarpZone('start', id_num=2, left=287*16, bot=9*16))
+            self.warp_zones.add(WarpZone('end', id_num=2, left=179*16, bot=10*16))
         if stage == 2:
             self.load('stage/stage2.txt', tile_dict)
-            self.warp_zones.add(WarpZone('start', id=1, left=171 * 16, bot=7 * 16))
-            self.warp_zones.add(WarpZone('end', id=1, left=215 * 16, bot=10 * 16))
+            self.warp_zones.add(WarpZone('start', id_num=1, left=171 * 16, bot=7 * 16))
+            self.warp_zones.add(WarpZone('end', id_num=1, left=215 * 16, bot=10 * 16))
         if stage == 3:
             self.load('stage/stage3.txt', tile_dict)
         if stage == 4:
             self.load('stage/stage4.txt', tile_dict)
         if stage == 5:
             self.load('stage/stage5.txt', tile_dict)
-            self.warp_zones.add(WarpZone('start', id=1, left=103 * 16, bot=8 * 16))
-            self.warp_zones.add(WarpZone('end', id=1, left=236 * 16, bot=4 * 16))
-            self.warp_zones.add(WarpZone('start', id=2, left=253 * 16, bot=10 * 16))
-            self.warp_zones.add(WarpZone('end', id=2, left=115 * 16, bot=10 * 16))
+            self.warp_zones.add(WarpZone('start', id_num=1, left=103 * 16, bot=8 * 16))
+            self.warp_zones.add(WarpZone('end', id_num=1, left=236 * 16, bot=4 * 16))
+            self.warp_zones.add(WarpZone('start', id_num=2, left=253 * 16, bot=10 * 16))
+            self.warp_zones.add(WarpZone('end', id_num=2, left=115 * 16, bot=10 * 16))
         if stage == 6:
             self.load('stage/stage6.txt', tile_dict)
         if stage == 7:
@@ -175,8 +176,20 @@ class StageManager:
                     # create enemy
                     if c == 'G':  # goomba
                         self.enemies.add(Goomba(self.screen, self.settings, col * 16, row * 16))
-                    if c == 'K':
-                        self.enemies.add(KoopaTroopa(self.screen, self.settings, col * 16, row * 16))
+                    elif c == 'K':
+                        self.enemies.add(KoopaTroopaGreen(self.screen, self.settings, col * 16, row * 16))
+                    elif c == 'R':
+                        self.enemies.add(KoopaTroopaRed(self.screen, self.settings, col * 16, row * 16))
+                    elif c == 'A':
+                        self.enemies.add(KoopaParatroopaRed(self.screen, self.settings, col * 16, row * 16))
+                    elif c == 'I':
+                        self.enemies.add(FireBar(self.screen, self.settings, (col-1) * 16, (row-1) * 16))
+                    elif c == '!':
+                        self.enemies.add(Blooper(self.screen, self.settings, col * 16, row * 16))
+                    elif c == 'a':
+                        self.enemies.add(PiranhaPlant(self.screen, self.settings, col * 16, row * 16))
+                    elif c == 'f':
+                        self.enemies.add(Podoboo(self.screen, self.settings, col * 16, row * 16))
                     col += 1
                 row += 1
         f.close()

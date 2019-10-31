@@ -235,7 +235,7 @@ class Player(Sprite):
                 if hit.tag == 'start':
                     if pygame.key.get_pressed()[K_s] or pygame.key.get_pressed()[K_DOWN]:
                         for w in warp_zones:
-                            if w.tag == 'end' and w.id == hit.id:
+                            if w.tag == 'end' and w.id_num == hit.id_num:
                                 self.vel.x = self.vel.y = 0
                                 destination = w.rect
                                 self.warp(destination.left, destination.bottom)
@@ -542,7 +542,7 @@ class Player(Sprite):
         if self.invincible:
             self.stats.score += enemy.point
             self.hud.prep_score()
-            enemy.get_hit()
+            enemy.die()
             return
 
         if enemy.tag != 'boss':
@@ -554,9 +554,10 @@ class Player(Sprite):
                 self.vel.y = -6
                 self.y += self.vel.y
                 self.rect.y = int(self.y)
-                enemy.die()
+                enemy.hit(self)
                 return
-        self.get_hit()
+        if enemy.m_dangerous:
+            self.get_hit()
 
     def draw1(self):  # draw with camera
         self.update_animation()

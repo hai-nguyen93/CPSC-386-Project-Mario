@@ -1,3 +1,6 @@
 sprites: https://github.com/vdeaugustine/Mario-Sprites/blob/master/Cut-Sprites-For-Mario.zip
+
 audio: https://downloads.khinsider.com/game-soundtracks/album/super-mario-bros
+       https://themushroomkingdom.net/media/smb/wav
+
 bowsette: https://www.deviantart.com/silverzeke/art/Bowsette-Sprites-765983741

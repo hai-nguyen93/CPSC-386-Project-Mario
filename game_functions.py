@@ -30,10 +30,10 @@ def check_keydown(event, player):
 
 
 def check_keyup(event, player):
+    _ = player
     if event.key == K_ESCAPE:
         terminate()
 
 
 def update_player(player, platforms, enemies, warp_zones):
     player.update(platforms, enemies, warp_zones)
-
