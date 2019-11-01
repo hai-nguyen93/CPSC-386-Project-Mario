@@ -126,7 +126,7 @@ class Player(Sprite):
         self.score_text = self.font.render('0', False, (255, 255, 255), self.settings.bg_color)
         self.score_rect = self.score_text.get_rect()
 
-    def update(self, platforms, enemies, warp_zones):
+    def update(self, platforms, enemies, warp_zones, moving_platforms):
         # check stage clear:
         if self.stage_clear:
             if self.clear_sound.is_finished():
@@ -240,6 +240,22 @@ class Player(Sprite):
                                 destination = w.rect
                                 self.warp(destination.left, destination.bottom)
                                 break
+
+            # check collision with moving platform
+            hit_platform = pygame.sprite.spritecollideany(self, moving_platforms, False)
+            if hit_platform:
+                for s in moving_platforms:
+                    c = self.rect.clip(s.rect)  # collision rect
+                    if c.width > c.height:
+                        if self.vel.y >= 0 and self.rect.top < s.rect.top:
+                            self.rect.bottom = s.rect.top + 1
+                            self.y = float(self.rect.y)
+                            self.is_grounded = True
+                            self.vel.y = 0
+                        if self.vel.y < 0 and self.rect.top - 1 < s.rect.bottom < self.rect.bottom:
+                            self.rect.top = s.rect.bottom
+                            self.y = float(self.rect.y)
+                            self.vel.y = 0
 
         self.move()
         self.y += self.vel.y

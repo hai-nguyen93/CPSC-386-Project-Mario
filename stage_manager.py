@@ -4,6 +4,7 @@ from enemy2 import *
 from pygame.sprite import Group
 from warp_zone import WarpZone
 from mystery_box import MysteryBox
+from moving_platform import MovingPlatform
 
 
 class StageManager:
@@ -11,9 +12,11 @@ class StageManager:
         self.stats = stats
         self.settings = settings
         self.screen = screen
+        self.screen_rect = screen.get_rect()
         self.enemies = Group()
         self.platforms = Group()
         self.warp_zones = Group()
+        self.moving_platforms = Group()
         self.boxes = Group()
         self.time_limit = 401000  # 401s
         self.time_start = 0
@@ -32,6 +35,8 @@ class StageManager:
             e.update(player, self.platforms, self.enemies)
         for p in self.platforms:
             p.update(self.platforms)
+        for m in self.moving_platforms:
+            m.update(self.moving_platforms)
 
     def draw(self, camera):
         for p in self.platforms:
@@ -40,6 +45,8 @@ class StageManager:
             e.draw(camera)
         for b in self.boxes:
             b.draw(camera)
+        for m in self.moving_platforms:
+            m.draw(camera)
         # for w in self.warp_zones:
         #    w.draw(self.screen, camera)
 
@@ -47,6 +54,7 @@ class StageManager:
         self.enemies.empty()
         self.platforms.empty()
         self.warp_zones.empty()
+        self.moving_platforms.empty()
         self.time_start = pygame.time.get_ticks()
         self.time_elapsed = 0
         # set up bg_color
@@ -117,10 +125,23 @@ class StageManager:
             self.load('stage/stage2.txt', tile_dict)
             self.warp_zones.add(WarpZone('start', id_num=1, left=171 * 16, bot=7 * 16))
             self.warp_zones.add(WarpZone('end', id_num=1, left=215 * 16, bot=10 * 16))
+            self.moving_platforms.add(MovingPlatform(self.screen, 'ground', 2238, 0, 1, 'vertical'))
+            self.moving_platforms.add(MovingPlatform(self.screen, 'ground', 2474, 0, -1, 'vertical'))
+            self.moving_platforms.add(MovingPlatform(
+                self.screen, 'ground', 2238, self.screen_rect.centery, 1, 'vertical'))
+            self.moving_platforms.add(MovingPlatform(
+                self.screen, 'ground', 2474, self.screen_rect.centery, -1, 'vertical'))
         if stage == 3:
             self.load('stage/stage3.txt', tile_dict)
+            self.moving_platforms.add(MovingPlatform(self.screen, 'ground', 880, 70, 1, 'vertical', y_range=130))
+            self.moving_platforms.add(MovingPlatform(self.screen, 'ground', 1320, 132, 1, 'horizontal', x_range=60))
+            self.moving_platforms.add(MovingPlatform(self.screen, 'ground', 1440, 150, -1, 'horizontal', x_range=60))
+            self.moving_platforms.add(MovingPlatform(self.screen, 'ground', 2058, 80, -1, 'horizontal', x_range=80))
         if stage == 4:
             self.load('stage/stage4.txt', tile_dict)
+            self.enemies.add(FakeBowser(self.screen, self.settings, 137*16, 8*16))
+            self.moving_platforms.add(MovingPlatform(
+                self.screen, 'ground', 2100, 80, -1, 'horizontal', x_range=100, size='med'))
         if stage == 5:
             self.load('stage/stage5.txt', tile_dict)
             self.warp_zones.add(WarpZone('start', id_num=1, left=103 * 16, bot=8 * 16))
@@ -133,6 +154,12 @@ class StageManager:
             self.load('stage/stage7.txt', tile_dict)
         if stage == 8:
             self.load('stage/stage8.txt', tile_dict)
+            self.moving_platforms.add(MovingPlatform(self.screen, 'ground', 1420, 0, 1, 'vertical', size='small'))
+            self.moving_platforms.add(MovingPlatform(
+                self.screen, 'ground', 1372, self.screen_rect.bottom, -1, 'vertical', size='small'))
+            self.moving_platforms.add(MovingPlatform(
+                self.screen, 'ground', 2166, 90, 1, 'horizontal', size='med', x_range=50))
+            self.enemies.add(FakeBowser(self.screen, self.settings, 137 * 16, 8 * 16, e_type='K'))
         if stage == self.stats.credits_stage:  # credits screen
             self.load('stage/credits.txt', tile_dict)
             for i in range(0, 18):

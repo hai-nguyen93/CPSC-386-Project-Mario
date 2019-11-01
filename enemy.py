@@ -107,7 +107,7 @@ class Goomba(Enemy):
         if sprites_hit:
             for s in sprites_hit:
                 # Enemy, ground can't be broke, brick can, pipe is pipe
-                if s.tag in ['brick', 'ground', 'pipe', 'mystery']:
+                if s.tag in ['brick', 'ground', 'pipe', 'mystery', 'bridge']:
                     c = self.rect.clip(s.rect)  # collision rect
                     if c.width >= c.height:
                         if self.vely >= 0:

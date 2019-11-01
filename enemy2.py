@@ -3,6 +3,7 @@ from pygame.sprite import Sprite
 from timer import Timer
 from pygame.font import Font
 import math
+import random
 
 # Add fire stick with boss tag and deleted (re: 'return' only) die function
 '''
@@ -171,7 +172,7 @@ class KoopaTroopaGreen(Enemy2):
         if sprites_hit:
             for s in sprites_hit:
                 # Enemy, ground can't be broke, brick can, pipe is pipe
-                if s.tag in ['brick', 'ground', 'pipe', 'mystery']:
+                if s.tag in ['brick', 'ground', 'pipe', 'mystery', 'bridge']:
                     original_rect = self.rect
                     c = self.rect.clip(s.rect)  # collision rect
                     if c.width >= c.height:
@@ -318,7 +319,7 @@ class KoopaTroopaRed(Enemy2):
         if sprites_hit:
             for s in sprites_hit:
                 # Enemy, ground can't be broke, brick can, pipe is pipe
-                if s.tag in ['brick', 'ground', 'pipe', 'mystery']:
+                if s.tag in ['brick', 'ground', 'pipe', 'mystery', 'bridge']:
                     original_rect = self.rect
                     c = self.rect.clip(s.rect)  # collision rect
                     if c.width >= c.height:
@@ -495,7 +496,7 @@ class KoopaParatroopaRed(Enemy2):
         if sprites_hit:
             for s in sprites_hit:
                 # Enemy, ground can't be broke, brick can, pipe is pipe
-                if s.tag in ['brick', 'ground', 'pipe', 'mystery']:
+                if s.tag in ['brick', 'ground', 'pipe', 'mystery', 'bridge']:
                     original_rect = self.rect
                     c = self.rect.clip(s.rect)  # collision rect
                     if c.width >= c.height:
@@ -734,7 +735,7 @@ class Blooper(Enemy2):
             'down': [load('images/Enemies/119.png')]
         }
         super().__init__(screen=screen, settings=settings, frames=self.frames[self.status],
-                         point=500, left=left, bot=bot)
+                         point=300, left=left, bot=bot)
 
         self.chasing_player = False
         self.base_loc = self.rect
@@ -844,7 +845,6 @@ class FireBar(Enemy2):
         self.screen_rect = screen.get_rect()
         self.m_dangerous = True
         self.e_dangerous = False
-        self.player = None
         self.frames = [
             load('images/Enemies/147.png'),
             pygame.transform.rotate(load('images/Enemies/147.png'), 90),
@@ -861,11 +861,9 @@ class FireBar(Enemy2):
         # center on below = +4, +12
 
         super().changetag('boss')
-        # super().changewait(200)
 
     def update(self, player, sprites, enemies):
         super().update(player, sprites, enemies)
-        self.player = player
 
     def hit(self, player):
         if player.invincible:
@@ -885,7 +883,7 @@ class FireBar(Enemy2):
 
 
 '''
-Enemy: Cheep Cheep swim
+Enemy: CheepCheep (Underwater)
 -
 Functions: Swim
 `
@@ -959,26 +957,17 @@ class CheepCheepO(Enemy2):
         self.chasing_player = False
         self.miny = 16
         self.y = self.settings.scr_height
-        self.speedy = 4
-        self.speedx = -.5
-        # max speed for x == 1?
+        self.speedy = self.settings.scr_height / 180
+        self.speedx = -1 * random.uniform(0.25, 1)
         self.adjusted = False
-
-    '''
-    4 Cases:
-    Mario is further away than max distance, max speed
-    Fish hits Mario on upward angle, downward angle, or has vertex at mario x
-    '''
 
     def update(self, player, sprites, enemies):
         super().update(player, sprites, enemies)
-        # self.delats.append(pygame.time.get_ticks() - self.delats[-1])
-        # print(sum(self.delats)/len(self.delats))
-        if self.rect.x - player.rect.x < 350:
+        if self.rect.x - player.rect.x < 1000:
             self.chasing_player = True
         if self.chasing_player and not self.dead:
             if self.waiting:
-                if pygame.time.get_ticks() - self.waittime >= 2000:
+                if pygame.time.get_ticks() - self.waittime >= 1000:
                     self.waiting = False
             else:
                 if self.y < self.miny + 16:
@@ -996,8 +985,16 @@ class CheepCheepO(Enemy2):
                     self.waittime = pygame.time.get_ticks()
                     self.waiting = True
                     if self.x < player.x:
+                        if abs(self.x - player.x) > 400:
+                            self.speedx = 2
+                        else:
+                            self.speedx = random.uniform(0.1, 0.8)
                         self.status = 'right'
                     else:
+                        if abs(self.x - player.x) > 400:
+                            self.speedx = -2
+                        else:
+                            self.speedx = -1 * random.uniform(0.1, 0.8)
                         self.status = 'left'
                     super().changeframes(self.frames[self.status])
                 self.y += self.speedy
@@ -1008,3 +1005,227 @@ class CheepCheepO(Enemy2):
     def hit(self, player):
         _ = player
         self.die()
+
+
+'''
+Enemy: Fake Bowser
+-
+Functions: Open Mouth Walk (Right/Left), Closed Mouth Walk (Right/Left), Jump, Shoot
+`
+Special Abilities: Guards a specific area
+
+Notes: Takes an additional default parameter 'e_type': G = Gooma, anything else = Koopa
+'''
+
+
+class FakeBowser(Enemy2):
+    def __init__(self, screen, settings, left, bot, e_type='G'):
+        self.screen = screen
+        self.screen_rect = screen.get_rect()
+        self.status = 'closedleft'
+        self.m_dangerous = True
+        self.e_dangerous = False
+        self.hitpoints = 5
+        self.frames = {
+            'openright': [load('images/Enemies/10.png'), load('images/Enemies/15.png')],
+            'closedright': [load('images/Enemies/16.png'), load('images/Enemies/17.png')],
+            'openleft': [load('images/Enemies/20.png'), load('images/Enemies/21.png')],
+            'closedleft': [load('images/Enemies/18.png'), load('images/Enemies/19.png')],
+            'dead': []
+        }
+        if e_type == 'G':
+            self.frames['dead'] = [pygame.transform.flip(load('images/Enemies/66.png'), False, True)]
+        else:
+            self.frames['dead'] = [pygame.transform.flip(load('images/Enemies/116.png'), False, True)]
+
+        super().__init__(screen=screen, settings=settings, frames=self.frames[self.status],
+                         point=100, left=left, bot=bot)
+        super().changetag('boss')
+
+        self.is_grounded = False
+        self.chasing_player = False
+        self.gravity = 0.025
+        self.vely = 0  # -1.5 for jumps
+        self.speedx = -.25
+        self.maxx = self.rect.x + self.rect.width + 32
+        self.minx = self.x - (16 * 10)
+        self.jumpdelay = pygame.time.get_ticks()
+        self.opendelay = 0
+        self.bolts = pygame.sprite.Group()
+
+    # apply vely when jump
+
+    def update(self, player, sprites, enemies):
+        super().update(player, sprites, enemies)
+
+        if self.x - player.x < 600:
+            self.chasing_player = True
+
+        if not self.chasing_player or self.dead:
+            return
+
+        # Jump logic
+        if random.randint(0, 40) == 10 and self.is_grounded:
+            if pygame.time.get_ticks() - self.jumpdelay > 5000:
+                self.jumpdelay = pygame.time.get_ticks()
+                self.vely = -1.5
+
+        # check falling off
+        if self.rect.y > self.screen_rect.height:
+            self.kill()
+
+        # gravity
+        if not self.is_grounded:
+            self.vely += self.gravity
+
+        # check x velocity
+        if self.x < self.minx:
+            self.speedx *= -1
+        elif self.x > self.maxx:
+            self.speedx *= -1
+        elif random.randint(0, 100) == 10 and self.is_grounded:
+            self.speedx *= -1
+
+        self.x += self.speedx
+        self.y += self.vely
+
+        self.rect.x = int(self.x)
+        self.rect.y = int(self.y)
+
+        # if status is open && time elapsed
+
+        # Check to see if landed
+        self.is_grounded = False
+        sprites_hit = pygame.sprite.spritecollide(self, sprites, False)
+        if sprites_hit:
+            for s in sprites_hit:
+                # Enemy, ground can't be broke, brick can, pipe is pipe
+                if s.tag in ['brick', 'ground', 'pipe', 'mystery', 'bridge']:
+                    c = self.rect.clip(s.rect)  # collision rect
+                    if c.width >= c.height:
+                        if self.vely >= 0:
+                            self.rect.bottom = s.rect.top + 1
+                            self.y = float(self.rect.y)
+                            self.is_grounded = True
+                            self.vely = 0
+
+        if random.randint(0, 125) == 10 and len(self.bolts) < 2:
+            self.fire(player)
+
+        if self.status == 'openright' and pygame.time.get_ticks() - self.opendelay >= 1500:
+            self.status = 'closedright'
+            super().changeframes(self.frames[self.status])
+        elif self.status == 'openleft' and pygame.time.get_ticks() - self.opendelay >= 1500:
+            self.status = 'closedleft'
+            super().changeframes(self.frames[self.status])
+
+        self.changedirection(player)
+        self.bolts.update()
+
+    def draw(self, camera):
+        if self.dead:
+            image = self.point_text
+        else:
+            image = self.anim.imagerect()
+        self.screen.blit(image, camera.apply(self))
+        for bolt in self.bolts:
+            bolt.draw(camera)
+
+    def fire(self, player):
+        if self.status == 'closedright' or self.status == 'openright':
+            direction = 1
+            width = self.rect.width
+        else:
+            direction = -1
+            width = 0
+        if random.randint(0, 1) == 0:
+            self.bolts.add(FlameBolt(self.screen, direction, self.x + width, self.y + 22, player, player.y))
+        else:
+            self.bolts.add(FlameBolt(self.screen, direction, self.x + width, self.y + 22, player, self.y + 20))
+
+        if self.status == 'closedright':
+            self.status = 'openright'
+            super().changeframes(self.frames[self.status])
+            self.opendelay = pygame.time.get_ticks()
+        elif self.status == 'closedleft':
+            self.status = 'openleft'
+            super().changeframes(self.frames[self.status])
+            self.opendelay = pygame.time.get_ticks()
+
+    def changedirection(self, player):
+        if self.x > player.x:
+            if self.status == 'closedright':
+                self.status = 'closedleft'
+                super().changeframes(self.frames[self.status])
+            elif self.status == 'openright':
+                self.status = 'openleft'
+                super().changeframes(self.frames[self.status])
+        else:
+            if self.status == 'closedleft':
+                self.status = 'closedright'
+                super().changeframes(self.frames[self.status])
+            elif self.status == 'openleft':
+                self.status = 'openright'
+                super().changeframes(self.frames[self.status])
+
+    def hit(self, player):
+        _ = player
+        self.hitpoints -= 1
+
+        if self.hitpoints <= 0:
+            self.status = 'dead'
+            super().changeframes(self.frames[self.status])
+            self.die()
+
+
+'''
+Enemy Subset: Fake Bowser
+-
+Functions: Travel
+`
+Special Abilities: Does not have wall collision
+'''
+
+
+class FlameBolt(Sprite):
+    def __init__(self, screen, direction, x, y, player, desiredy):
+        super().__init__()
+        self.screen = screen
+        self.speed = 1.5
+        self.max_distace = 750
+        self.traveled_distance = 0
+        self.direction = direction
+        if direction == -1:
+            images = [load('images/Enemies/11.png'), load('images/Enemies/12.png')]
+        else:
+            images = [load('images/Enemies/13.png'), load('images/Enemies/14.png')]
+        self.anim = Timer(images)
+        self.rect = self.anim.frames[0].get_rect()
+        self.rect.x = x
+        self.rect.y = y
+        self.x = float(self.rect.x)
+        self.y = float(self.rect.y)
+        self.player = player
+        self.desiredy = desiredy
+
+    def update(self):
+        if self.traveled_distance >= self.max_distace:
+            self.kill()
+        else:
+            self.x += (self.direction * self.speed)
+            self.traveled_distance += self.speed
+
+            if self.y < self.desiredy:
+                self.y += abs(self.speed) / 2
+
+            self.rect.x = int(self.x)
+            self.rect.y = int(self.y)
+
+            # check collision with enemies
+            hit = pygame.sprite.collide_rect(self, self.player)
+            if hit:
+                if not self.player.invincible:
+                    self.player.get_hit()
+
+    def draw(self, camera):
+        self.screen.blit(self.anim.imagerect(), camera.apply(self))

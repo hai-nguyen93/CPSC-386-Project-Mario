@@ -35,5 +35,5 @@ def check_keyup(event, player):
         terminate()
 
 
-def update_player(player, platforms, enemies, warp_zones):
-    player.update(platforms, enemies, warp_zones)
+def update_player(player, platforms, enemies, warp_zones, moving_platforms):
+    player.update(platforms, enemies, warp_zones, moving_platforms)
