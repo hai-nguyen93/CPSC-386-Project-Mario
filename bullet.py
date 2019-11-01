@@ -30,12 +30,12 @@ class Bullet(Sprite):
 
             # check collision with enemies
             hit = pygame.sprite.spritecollideany(self, enemies)
-            if hit:
+            if hit and hit.tag != 'boss':
                 if not hit.dead:
                     player.stats.score += hit.point
                     player.hud.prep_score()
                     self.kill()
-                    hit.get_hit()
+                    hit.die()
 
             # check collision with platforms
             hit = pygame.sprite.spritecollideany(self, platforms)
