@@ -190,6 +190,8 @@ class StageManager:
                         self.enemies.add(PiranhaPlant(self.screen, self.settings, col * 16, row * 16))
                     elif c == 'H':  # cheep cheep swim
                         self.enemies.add(CheepCheepU(self.screen, self.settings, col * 16, row * 16))
+                    elif c == 'E':  # cheep cheep fly
+                        self.enemies.add(CheepCheepO(self.screen, self.settings, col * 16, row * 16))
                     elif c == 'f':  # fire ball
                         self.enemies.add(Podoboo(self.screen, self.settings, col * 16, row * 16))
                     col += 1

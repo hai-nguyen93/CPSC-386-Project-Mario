@@ -868,8 +868,8 @@ class FireBar(Enemy2):
         self.player = player
 
     def hit(self, player):
-        _ = player
-        self.kill()
+        if player.invincible:
+            self.kill()
 
     def draw(self, camera):
         image = self.anim.imagerect()
@@ -923,6 +923,85 @@ class CheepCheepU(Enemy2):
             self.x -= self.speedx
             self.y -= self.speedy
 
+        self.rect.x = int(self.x)
+        self.rect.y = int(self.y)
+
+    def hit(self, player):
+        _ = player
+        self.die()
+
+
+'''
+Enemy: CheepCheep (Overworld)
+-
+Functions: Leap
+`
+Special Abilities: None
+'''
+
+
+class CheepCheepO(Enemy2):
+    def __init__(self, screen, settings, left, bot):
+        self.screen = screen
+        self.screen_rect = screen.get_rect()
+        self.m_dangerous = True
+        self.e_dangerous = False
+        self.waittime = pygame.time.get_ticks()
+        self.waiting = True
+        self.status = 'left'
+        self.frames = {
+            'left': [load('images/Enemies/22.png'), load('images/Enemies/23.png')],
+            'right': [load('images/Enemies/24.png'), load('images/Enemies/25.png')]
+        }
+        super().__init__(screen=screen, settings=settings, frames=self.frames[self.status],
+                         point=100, left=left, bot=bot)
+
+        self.chasing_player = False
+        self.miny = 16
+        self.y = self.settings.scr_height
+        self.speedy = 4
+        self.speedx = -.5
+        # max speed for x == 1?
+        self.adjusted = False
+
+    '''
+    4 Cases:
+    Mario is further away than max distance, max speed
+    Fish hits Mario on upward angle, downward angle, or has vertex at mario x
+    '''
+
+    def update(self, player, sprites, enemies):
+        super().update(player, sprites, enemies)
+        # self.delats.append(pygame.time.get_ticks() - self.delats[-1])
+        # print(sum(self.delats)/len(self.delats))
+        if self.rect.x - player.rect.x < 350:
+            self.chasing_player = True
+        if self.chasing_player and not self.dead:
+            if self.waiting:
+                if pygame.time.get_ticks() - self.waittime >= 2000:
+                    self.waiting = False
+            else:
+                if self.y < self.miny + 16:
+                    if not self.adjusted:
+                        self.speedy *= .5
+                        self.adjusted = True
+                elif self.y > self.miny + 16:
+                    if self.adjusted:
+                        self.speedy *= 2
+                        self.adjusted = False
+                if self.y < self.miny:
+                    self.speedy *= -1
+                elif self.y > self.settings.scr_height:
+                    self.speedy *= -1
+                    self.waittime = pygame.time.get_ticks()
+                    self.waiting = True
+                    if self.x < player.x:
+                        self.status = 'right'
+                    else:
+                        self.status = 'left'
+                    super().changeframes(self.frames[self.status])
+                self.y += self.speedy
+                self.x += self.speedx
         self.rect.x = int(self.x)
         self.rect.y = int(self.y)
 
