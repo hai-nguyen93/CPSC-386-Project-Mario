@@ -202,9 +202,16 @@ class StageManager:
                             self.platforms.add(Tile(self.screen, tile_dict[c][0], tile_dict[c][1], col * 16, row * 16))
                     # create enemy
                     if c == 'G':  # goomba
-                        self.enemies.add(Goomba(self.screen, self.settings, col * 16, row * 16))
+                        if self.stats.current_stage == 2:
+                            self.enemies.add(Goomba(self.screen, self.settings, col * 16, row * 16, True))
+                        else:
+                            self.enemies.add(Goomba(self.screen, self.settings, col * 16, row * 16))
+
                     elif c == 'K':  # green koopa
-                        self.enemies.add(KoopaTroopaGreen(self.screen, self.settings, col * 16, row * 16))
+                        if self.stats.current_stage == 2:
+                            self.enemies.add(KoopaTroopaGreen(self.screen, self.settings, col * 16, row * 16, True))
+                        else:
+                            self.enemies.add(KoopaTroopaGreen(self.screen, self.settings, col * 16, row * 16))
                     elif c == 'R':  # red koopa
                         self.enemies.add(KoopaTroopaRed(self.screen, self.settings, col * 16, row * 16))
                     elif c == 'A':  # fly koopa

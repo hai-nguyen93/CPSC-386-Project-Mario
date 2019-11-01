@@ -101,7 +101,7 @@ Special Abilities: None
 
 
 class KoopaTroopaGreen(Enemy2):
-    def __init__(self, screen, settings, left, bot):
+    def __init__(self, screen, settings, left, bot, altframes=False):
         self.screen = screen
         self.screen_rect = screen.get_rect()
         self.status = 'walkleft'
@@ -109,19 +109,28 @@ class KoopaTroopaGreen(Enemy2):
         self.e_dangerous = False
         self.shell_time = 0
         self.unshell_time = 0
-        self.frames = {
-            'walkleft': [load('images/Enemies/87.png'), load('images/Enemies/96.png')],
-            'walkright': [load('images/Enemies/106.png'), load('images/Enemies/97.png')],
-            'shell': [load('images/Enemies/118.png')],
-            'mshell': [load('images/Enemies/118.png')],
-            'unshell': [load('images/Enemies/113.png')]
-        }
+        if not altframes:
+            self.frames = {
+                'walkleft': [load('images/Enemies/87.png'), load('images/Enemies/96.png')],
+                'walkright': [load('images/Enemies/106.png'), load('images/Enemies/97.png')],
+                'shell': [load('images/Enemies/118.png')],
+                'mshell': [load('images/Enemies/118.png')],
+                'unshell': [load('images/Enemies/113.png')]
+            }
+        else:
+            self.frames = {
+                'walkleft': [load('images/Enemies/89.png'), load('images/Enemies/94.png')],
+                'walkright': [load('images/Enemies/99.png'), load('images/Enemies/104.png')],
+                'shell': [load('images/Enemies/116.png')],
+                'mshell': [load('images/Enemies/116.png')],
+                'unshell': [load('images/Enemies/115.png')]
+            }
         super().__init__(screen=screen, settings=settings, frames=self.frames[self.status],
                          point=200, left=left, bot=bot)
 
         self.is_grounded = False
         self.chasing_player = False
-        self.speed = 1
+        self.speed = .5
         self.gravity = 0.3
         self.vely = 0
 
@@ -267,7 +276,7 @@ class KoopaTroopaRed(Enemy2):
 
         self.is_grounded = False
         self.chasing_player = False
-        self.speed = 1
+        self.speed = .5
         self.gravity = 0.3
         self.vely = 0
 
@@ -304,7 +313,7 @@ class KoopaTroopaRed(Enemy2):
                         self.unshell_time = pygame.time.get_ticks()
                     else:
                         if pygame.time.get_ticks() - self.unshell_time > 500:
-                            self.speed = 1
+                            self.speed = .5
                             self.status = 'walkleft'
                             self.m_dangerous = True
                             super().changeframes(self.frames[self.status])
@@ -478,7 +487,7 @@ class KoopaParatroopaRed(Enemy2):
                             self.unshell_time = pygame.time.get_ticks()
                         else:
                             if pygame.time.get_ticks() - self.unshell_time > 500:
-                                self.speed = 1
+                                self.speed = .5
                                 self.status = 'walkleft'
                                 self.m_dangerous = True
                                 super().changeframes(self.frames[self.status])
@@ -561,7 +570,7 @@ class KoopaParatroopaRed(Enemy2):
     def hit(self, player):
         if self.status == 'fly':
             self.status = 'walkleft'
-            self.speed = 1
+            self.speed = .5
             super().changeframes(self.frames[self.status])
         elif self.status == 'walkright' or self.status == 'walkleft':
             self.status = 'shell'
@@ -667,7 +676,7 @@ class Podoboo(Enemy2):
                          point=0, left=left, bot=bot)
 
         self.chasing_player = False
-        self.speed = -2
+        self.speed = -1
         self.miny = 100
         self.y = self.settings.scr_height
 
@@ -683,14 +692,14 @@ class Podoboo(Enemy2):
             else:
                 if self.y < self.miny + 10:
                     if self.speed >= 0:
+                        self.speed = .5
+                    else:
+                        self.speed = -.5
+                else:
+                    if self.speed >= 0:
                         self.speed = 1
                     else:
                         self.speed = -1
-                else:
-                    if self.speed >= 0:
-                        self.speed = 2
-                    else:
-                        self.speed = -2
                 if self.y < self.miny:
                     self.status = 'down'
                     super().changeframes(self.frames[self.status])

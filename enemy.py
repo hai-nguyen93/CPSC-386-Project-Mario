@@ -64,16 +64,19 @@ class Enemy(Sprite):
 
 
 class Goomba(Enemy):
-    def __init__(self, screen, settings, left, bot):
+    def __init__(self, screen, settings, left, bot, altframes=False):
         self.screen = screen
         self.screen_rect = screen.get_rect()
-        self.frames = [pygame.image.load('images/enemy/goomba1.bmp'),
-                       pygame.image.load('images/enemy/goomba2.bmp')]
+        if not altframes:
+            self.frames = [pygame.image.load('images/enemy/goomba1.bmp'),
+                           pygame.image.load('images/enemy/goomba2.bmp')]
+        else:
+            self.frames = [load('images/Enemies/74.png'), load('images/Enemies/75.png')]
         super().__init__(screen=screen, settings=settings, frames=self.frames, point=100, left=left, bot=bot)
 
         self.is_grounded = False
         self.chasing_player = False
-        self.speed = 1
+        self.speed = .5
         self.gravity = 0.3
         self.vely = 0
         self.m_dangerous = True
