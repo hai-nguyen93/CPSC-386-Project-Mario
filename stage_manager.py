@@ -176,19 +176,21 @@ class StageManager:
                     # create enemy
                     if c == 'G':  # goomba
                         self.enemies.add(Goomba(self.screen, self.settings, col * 16, row * 16))
-                    elif c == 'K':
+                    elif c == 'K':  # green koopa
                         self.enemies.add(KoopaTroopaGreen(self.screen, self.settings, col * 16, row * 16))
-                    elif c == 'R':
+                    elif c == 'R':  # red koopa
                         self.enemies.add(KoopaTroopaRed(self.screen, self.settings, col * 16, row * 16))
-                    elif c == 'A':
+                    elif c == 'A':  # fly koopa
                         self.enemies.add(KoopaParatroopaRed(self.screen, self.settings, col * 16, row * 16))
-                    elif c == 'I':
+                    elif c == 'I':  # firebar
                         self.enemies.add(FireBar(self.screen, self.settings, (col-1) * 16, (row-1) * 16))
-                    elif c == '!':
+                    elif c == '!':  # blooper
                         self.enemies.add(Blooper(self.screen, self.settings, col * 16, row * 16))
-                    elif c == 'a':
+                    elif c == 'a':  # piranha plant
                         self.enemies.add(PiranhaPlant(self.screen, self.settings, col * 16, row * 16))
-                    elif c == 'f':
+                    elif c == 'H':  # cheep cheep swim
+                        self.enemies.add(CheepCheepU(self.screen, self.settings, col * 16, row * 16))
+                    elif c == 'f':  # fire ball
                         self.enemies.add(Podoboo(self.screen, self.settings, col * 16, row * 16))
                     col += 1
                 row += 1

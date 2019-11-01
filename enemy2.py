@@ -882,3 +882,50 @@ class FireBar(Enemy2):
         base_rect = pygame.Rect(self.basex - 4, self.basey + 4, 8, 8)
         self.rect = base_rect.union(pygame.Rect(self.rect.x, self.rect.y, 8, 8))
         # pygame.draw.rect(self.screen, (255, 255, 255), self.rect)
+
+
+'''
+Enemy: Cheep Cheep swim
+-
+Functions: Swim
+`
+Special Abilities: None
+'''
+
+
+class CheepCheepU(Enemy2):
+    def __init__(self, screen, settings, left, bot):
+        self.screen = screen
+        self.screen_rect = screen.get_rect()
+        self.m_dangerous = True
+        self.e_dangerous = False
+        self.frames = [load('images/Enemies/30.png'), load('images/Enemies/31.png')]
+        super().__init__(screen=screen, settings=settings, frames=self.frames,
+                         point=100, left=left, bot=bot)
+
+        self.chasing_player = False
+        self.miny = 16
+        self.maxy = self.settings.scr_height - 16
+        self.speedx = .4
+        self.speedy = .05
+
+    def update(self, player, sprites, enemies):
+        super().update(player, sprites, enemies)
+
+        if self.rect.x - player.rect.x < 1500:
+            self.chasing_player = True
+        if self.chasing_player and not self.dead:
+            if self.y < self.miny:
+                self.speedy *= -1
+            elif self.y > self.maxy:
+                self.speedy *= -1
+
+            self.x -= self.speedx
+            self.y -= self.speedy
+
+        self.rect.x = int(self.x)
+        self.rect.y = int(self.y)
+
+    def hit(self, player):
+        _ = player
+        self.die()
